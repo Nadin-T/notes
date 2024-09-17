@@ -15,7 +15,7 @@ class Note:
         self.created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.updated_at = self.created_at
 
-# notes = []
+notes = []
 
 def get_next_id():
     if not notes:
@@ -63,6 +63,32 @@ def list_notes(filter_date=None):
             print(f"ID: {note.id}, Заголовок: {note.title}, Дата: {note.created_at}")
     else:
         print("Нет сохраненных заметок.")
+        
+def get_note(identifier):
+    # Проверяем, является ли идентификатор числом (ID)
+    if identifier.isdigit():
+        for note in notes:
+            if note.id == identifier:
+                print(f"ID: {note.id}")
+                print(f"Заголовок: {note.title}")
+                print(f"Содержимое: {note.body}")
+                print(f"Дата создания: {note.created_at}")
+                print(f"Дата обновления: {note.updated_at}")
+                return
+        print(f"Заметка с ID '{identifier}' не найдена.")
+    else:
+        # Ищем заметки по заголовку
+        found_notes = [note for note in notes if note.title == identifier]
+        if found_notes:
+            for note in found_notes:
+                print(f"ID: {note.id}")
+                print(f"Заголовок: {note.title}")
+                print(f"Содержимое: {note.body}")
+                print(f"Дата создания: {note.created_at}")
+                print(f"Дата обновления: {note.updated_at}")
+                print()
+        else:
+            print(f"Заметки с заголовком '{identifier}' не найдены.")
 
 def save_notes():
     with open("notes.json", "w") as f:
@@ -100,6 +126,7 @@ def main():
     print("2. Изменить заметку")
     print("3. Удалить заметку")
     print("4. Показать заметки")
+    print("5. Найти заметку")
     print("0. Выход из программы")
     
     while True:
@@ -120,6 +147,19 @@ def main():
         elif command == "4":
             filter_date = input("Введите дату для фильтрации (YYYY-MM-DD, оставьте пустым для показа всех): ")
             list_notes(filter_date)
+        elif command == "5":
+            print("Выберите способ поиска:")
+            print("1. Поиск по ID")
+            print("2. Поиск по заголовку")
+            search_method = input()
+            if search_method == "1":
+                note_id = input("Введите ID заметки: ")
+                get_note(note_id)
+            elif search_method == "2":
+                note_title = input("Введите заголовок заметки: ")
+                get_note(note_title)
+            else:
+                print("Неизвестная команда. Попробуйте еще раз.")
         elif command == "0":
             save_notes()
             break
@@ -132,6 +172,7 @@ def main():
         print("2. Изменить заметку")
         print("3. Удалить заметку")
         print("4. Показать заметки")
+        print("5. Найти заметку")
         print("0. Выход из программы")
 
 if __name__ == "__main__":
