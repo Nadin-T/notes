@@ -10,6 +10,7 @@ from datetime import datetime
 class Note:
     def __init__(self, title, body):
         self.id = str(len(notes) + 1)
+        # self.id = id
         self.title = title
         self.body = body
         self.created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -19,9 +20,19 @@ notes = []
 
 def add_note(title, body):
     note = Note(title, body)
+    note.id = generate_unique_id()
     notes.append(note)
     save_notes()
     print(f"Заметка '{note.title}' успешно сохранена.")
+
+    
+def generate_unique_id():
+    used_ids = [note.id for note in notes]
+    new_id = str(len(notes) + 1)
+    while new_id in used_ids:
+        new_id = str(int(new_id) + 1)
+    return new_id
+
 
 def edit_note(note_id, new_title, new_body):
     for note in notes:
