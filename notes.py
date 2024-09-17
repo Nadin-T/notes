@@ -8,30 +8,26 @@ import json
 from datetime import datetime
 
 class Note:
-    def __init__(self, title, body):
-        self.id = str(len(notes) + 1)
-        # self.id = id
+    def __init__(self, id, title, body):
+        self.id = id
         self.title = title
         self.body = body
         self.created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.updated_at = self.created_at
 
-notes = []
+# notes = []
+
+def get_next_id():
+    if not notes:
+        return "1"
+    else:
+        return str(int(notes[-1].id) + 1)
 
 def add_note(title, body):
-    note = Note(title, body)
-    note.id = generate_unique_id()
+    note = Note(get_next_id(), title, body)
     notes.append(note)
     save_notes()
     print(f"Заметка '{note.title}' успешно сохранена.")
-
-    
-def generate_unique_id():
-    used_ids = [note.id for note in notes]
-    new_id = str(len(notes) + 1)
-    while new_id in used_ids:
-        new_id = str(int(new_id) + 1)
-    return new_id
 
 
 def edit_note(note_id, new_title, new_body):
@@ -44,6 +40,7 @@ def edit_note(note_id, new_title, new_body):
             print(f"Заметка '{note.title}' успешно обновлена.")
             return
     print(f"Заметка с ID '{note_id}' не найдена.")
+
 
 def delete_note(note_id):
     for i, note in enumerate(notes):
@@ -71,12 +68,18 @@ def save_notes():
     with open("notes.json", "w") as f:
         json.dump([note.__dict__ for note in notes], f, indent=4)
 
+
 def load_notes():
     global notes
     try:
         with open("notes.json", "r") as f:
             note_dicts = json.load(f)
-            notes = [Note(**note_dict) for note_dict in note_dicts]
+            notes = []
+            for note_dict in note_dicts:
+                note = Note(note_dict["id"], note_dict["title"], note_dict["body"])
+                note.created_at = note_dict["created_at"]
+                note.updated_at = note_dict["updated_at"]
+                notes.append(note)
     except FileNotFoundError:
         print("Файл с заметками не найден. Создается новый файл.")
     except json.JSONDecodeError:
@@ -118,6 +121,7 @@ def main():
             filter_date = input("Введите дату для фильтрации (YYYY-MM-DD, оставьте пустым для показа всех): ")
             list_notes(filter_date)
         elif command == "0":
+            save_notes()
             break
         else:
             print("Неизвестная команда. Попробуйте еще раз.")
